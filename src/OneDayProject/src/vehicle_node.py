@@ -151,33 +151,31 @@ class Environments(object):
 
             # 위치(d값)의 변화 계산
             d_changes = np.diff(veh_data[:, 3])
+            # print(d_changes)
+            # pred_value = np.mean(np.abs(d_changes))
+            # print(pred_value)
 
-            pred = "LC" if np.mean(np.abs(d_changes)) > 0.5 else "LK"
+            pred = "LC" if np.mean(np.abs(d_changes)) > 0.035 else "LK"
             gt = "LC" if self.vehicles[i][self.time][9] == 1 else "LK"
 
 
             q = tf.transformations.quaternion_from_euler(0, 0, self.vehicles[i][self.time][6])
-
             marker = Marker()
             marker.header.frame_id = "world"
             marker.header.stamp = rospy.Time.now()
             marker.id = i
             marker.type = Marker.CUBE
-
             marker.pose.position.x = self.vehicles[i][self.time][4]
             marker.pose.position.y = self.vehicles[i][self.time][5]
             marker.pose.position.z = 0.5
-
             marker.pose.orientation.x = q[0]
             marker.pose.orientation.y = q[1]
             marker.pose.orientation.z = q[2]
             marker.pose.orientation.w = q[3]
-
             marker.scale.x = self.vehicles[i][self.time][12]
             marker.scale.y = self.vehicles[i][self.time][13]
             marker.scale.z = 1
             marker.color.a = 1.0
-
             Objects.markers.append(marker)
 
             text = Marker()
@@ -185,14 +183,11 @@ class Environments(object):
             text.ns = "text"
             text.id = i
             text.type = Marker.TEXT_VIEW_FACING
-
             text.action = Marker.ADD
-
             text.color = ColorRGBA(1, 1, 1, 1)
             text.scale.z = 5
-            text.text = str(i)+" / True : " + gt+" / Pred : "  + pred
+            text.text = str(i) + " / True : " + gt + " / Pred : " + pred
             text.pose.position = Point(self.vehicles[i][self.time][4], self.vehicles[i][self.time][5], 3)
-
             Texts.markers.append(text)
 
         self.sur_pose_plot.publish(Objects)
